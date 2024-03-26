@@ -1,4 +1,7 @@
 --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-3.11.txt"
 
+snowflake-connector-python==3.6.0
+snowflake-sqlalchemy==1.5.1
 apache-airflow-providers-snowflake==5.2.1
+apache-airflow-providers-datadog==3.5.1
 apache-airflow-providers-mysql==5.5.1

@@ -5,11 +5,14 @@
 import json
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
+
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
 default_args = {
     'owner': 'airflow',
 }
+
+
 @dag(default_args=default_args, schedule_interval="@daily", start_date=days_ago(2), tags=['example'])
 def dag_with_taskflow_api():
     """
@@ -20,6 +23,7 @@ def dag_with_taskflow_api():
     located
     [here](https://airflow.apache.org/docs/stable/tutorial_taskflow_api.html)
     """
+
     @task()
     def extract():
         """
@@ -32,6 +36,7 @@ def dag_with_taskflow_api():
 
         order_data_dict = json.loads(data_string)
         return order_data_dict
+
     @task(multiple_outputs=True)
     def transform(order_data_dict: dict):
         """
@@ -45,6 +50,7 @@ def dag_with_taskflow_api():
             total_order_value += value
 
         return {"total_order_value": total_order_value}
+
     @task()
     def load(total_order_value: float):
         """
@@ -54,7 +60,10 @@ def dag_with_taskflow_api():
         """
 
         print("Total order value is: %.2f" % total_order_value)
+
     order_data = extract()
     order_summary = transform(order_data)
     load(order_summary["total_order_value"])
+
+
 dag_with_taskflow_api = dag_with_taskflow_api()
