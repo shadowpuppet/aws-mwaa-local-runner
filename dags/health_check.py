@@ -1,6 +1,8 @@
-from airflow import DAG
 from datetime import datetime
+
+from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 
 def health_check():
@@ -17,3 +19,11 @@ with DAG(
         task_id="health_check",
         python_callable=health_check,
     )
+
+    task2 = SQLExecuteQueryOperator(
+        task_id="snowflake_check",
+        conn_id="snowflake_conn_serviceaccount",
+        sql="SHOW TABLES"
+    )
+
+task1 >> task2
