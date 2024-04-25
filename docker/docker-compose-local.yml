@@ -34,7 +34,7 @@ services:
             # Add a connections.json file to it along with any private keys needed for connecting
             # Directory will be mounted and connections in connections.json will be created
             # Connections will not show up in the UI , but are usable in DAGS
-            - "${AIRFLOW_LOCAL_CONNECTIONS_DIR}:/usr/local/airflow/files"
+            - "${AIRFLOW_LOCAL_CONNECTIONS_DIR:-${PWD}/example_connections}:/usr/local/airflow/files"
         ports:
             - "8080:8080"
         command: local-runner
