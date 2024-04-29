@@ -11,7 +11,7 @@ services:
                 max-size: 10m
                 max-file: "3"
         volumes:
-            - "${PWD}/db-data:/var/lib/postgresql/data"
+           - "/db-data:/var/lib/postgresql/data"
 
     local-runner:
         image: amazon/mwaa-local:2_8
@@ -30,6 +30,11 @@ services:
             - "${PWD}/plugins:/usr/local/airflow/plugins"
             - "${PWD}/requirements:/usr/local/airflow/requirements"
             - "${PWD}/startup_script:/usr/local/airflow/startup"
+            # Set this variable to somewhere not under source control to prevent sharing creds
+            # Add a connections.json file to it along with any private keys needed for connecting
+            # Directory will be mounted and connections in connections.json will be created
+            # Connections will not show up in the UI , but are usable in DAGS
+            - "${AIRFLOW_LOCAL_CONNECTIONS_DIR:-${PWD}/example_connections}:/usr/local/airflow/files"
         ports:
             - "8080:8080"
         command: local-runner
