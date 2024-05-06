@@ -1,14 +1,14 @@
 {
-    "snowflake_conn": {
+    "snowflake_conn_serviceaccount": {
         "conn_type": "snowflake",
-        "login": "USERNAME",
-        "password": " ",
-        "schema": " ",
-        "role": "SOME ROLE",
+        "login": "<Snowflake Username>",
+        "password": "<Snowflake Key Passphrase>",
+        "schema": "<Default Schema (Optional)>",
         "extra": {
             "account": " ",
             "database": "SOME_DATABASE",
             "region": "us-west-2",
+            "role": "SOME ROLE",
             "warehouse": "SOME_WAREHOUSE",
             "private_key_file": "./files/{name_of_private_key}.p8"
         }
