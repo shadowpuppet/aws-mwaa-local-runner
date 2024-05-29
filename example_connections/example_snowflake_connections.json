@@ -8,7 +8,7 @@
             "account": " ",
             "database": "SOME_DATABASE",
             "region": "us-west-2",
-            "role": "SOME ROLE",
+            "role": "DEV_AIRFLOW",
             "warehouse": "SOME_WAREHOUSE",
             "private_key_file": "./files/{name_of_private_key}.p8"
         }
