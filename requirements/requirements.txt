@@ -5,3 +5,7 @@ snowflake-sqlalchemy==1.5.1
 apache-airflow-providers-snowflake==5.2.1
 apache-airflow-providers-datadog==3.5.1
 apache-airflow-providers-mysql==5.5.1
+apache-airflow-providers-ssh==3.10.0
+sshtunnel==0.4.0
+psycopg2-binary==2.9.9
+boto3==1.33.13
