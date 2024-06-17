@@ -1,11 +1,10 @@
 import boto3
-import sshtunnel
 import psycopg2
-from datetime import datetime
+import sshtunnel
 
 from airflow import DAG
 from airflow.models import Variable
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 
 
 def get_iam_token(host, port, user, region):
@@ -15,13 +14,13 @@ def get_iam_token(host, port, user, region):
 
 
 def connect_via_ssh():
-    ssh_host = Variable.get("SSH_HOST")
+    ssh_host = Variable.get("ssh_host")
     ssh_port = 22
-    ssh_user = Variable.get("SSH_USER")
-    ssh_pkey = '/usr/local/airflow/files/private_key.pem'  # Path to your SSH private key file
-    db_host = Variable.get("DB_HOST")
-    db_user = Variable.get("DB_USER")  # This is the IAM user or role
-    db_name = Variable.get("DB_NAME")
+    ssh_user = Variable.get("ssh_user")
+    ssh_pkey = '/usr/local/airflow/files/ssh_host.pem'  # Path to your SSH private key file
+    db_host = Variable.get("postgres_db_host")
+    db_user = Variable.get("postgres_db_user")  # This is the IAM user or role
+    db_name = Variable.get("postgres_db_name")
     db_port = 5432
     region = 'us-west-2'
 
@@ -48,15 +47,11 @@ def connect_via_ssh():
         connection.close()
 
 
-default_args = {
-    'owner': 'airflow',
-    'start_date': datetime(2024, 6, 14),
-}
-
-dag = DAG(dag_id='postgress_connection_testing', default_args=default_args, schedule_interval='@hourly')
-
-run_query = PythonOperator(
-    task_id='run_query',
-    python_callable=connect_via_ssh,
-    dag=dag
-)
+with DAG(
+    dag_id='POSTGRESS_CONNECTION_TESTING',
+    schedule=None
+) as dag:
+    run_query = PythonOperator(
+        task_id='run_query',
+        python_callable=connect_via_ssh,
+    )
