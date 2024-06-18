@@ -14,13 +14,13 @@ def get_iam_token(host, port, user, region):
 
 
 def connect_via_ssh():
-    ssh_host = Variable.get("ssh_host")
+    ssh_host = Variable.get("SSH_HOST")
     ssh_port = 22
-    ssh_user = Variable.get("ssh_user")
+    ssh_user = Variable.get("SSH_USER")
     ssh_pkey = '/usr/local/airflow/files/ssh_host.pem'  # Path to your SSH private key file
-    db_host = Variable.get("postgres_db_host")
-    db_user = Variable.get("postgres_db_user")  # This is the IAM user or role
-    db_name = Variable.get("postgres_db_name")
+    db_host = Variable.get("POSTGRES_DB_HOST")
+    db_user = Variable.get("POSTGRES_DB_USER")  # This is the IAM user or role
+    db_name = Variable.get("POSTGRES_DB_NAME")
     db_port = 5432
     region = 'us-west-2'
 
