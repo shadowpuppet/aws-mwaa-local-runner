@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 services:
     postgres:
         image: postgres:13-alpine
@@ -14,7 +14,7 @@ services:
            - "/db-data:/var/lib/postgresql/data"
 
     local-runner:
-        image: amazon/mwaa-local:2_8
+        image: amazon/mwaa-local:2_9
         restart: always
         depends_on:
             - postgres
