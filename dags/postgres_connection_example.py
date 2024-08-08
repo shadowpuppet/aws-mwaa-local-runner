@@ -28,7 +28,7 @@ def connect_via_ssh():
     
     token = get_iam_token(db_host, db_port, db_user, region)
     """Establish a connection to a postgres database."""
-    conn = Connection.get_connection_from_secrets('postgres_rds')
+    conn = Connection.get_connection_from_secrets('test_postgres_iam_conn')
     conn_args = {
             "host": conn.host,
             "user": conn.login,
@@ -49,7 +49,8 @@ def connect_via_ssh():
 
 with DAG(
     dag_id='POSTGRESS_CONNECTION_TESTING',
-    schedule=None
+    schedule=None,
+    params={'rds_schema': Variable.get('RDS_SCHEMA')}
 ) as dag:
     run_query = PythonOperator(
         task_id='run_query',
@@ -58,6 +59,6 @@ with DAG(
 
     operator_query = SQLExecuteQueryOperator(
         task_id = 'operator_query',
-        sql = "select * from testseesawpr2838.engagement_district_usage limit 5;",
-        conn_id = 'postgres_rds',
+        sql = "select * from {{ params.rds_schema }}.engagement_district_usage limit 5;",
+        conn_id = 'test_postgres_iam_conn',
     )
