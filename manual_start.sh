@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo 'Running sample prestartup script.'
+echo 'Running manual startup script.'
 
 export $(jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' ${AIRFLOW_LOCAL_CONNECTIONS_DIR}/variables.json)
 

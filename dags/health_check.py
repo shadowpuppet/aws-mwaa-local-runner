@@ -10,10 +10,10 @@ def health_check():
 
 
 with DAG(
-        dag_id="health_check_dag",
-        start_date=datetime(2024, 3, 26),
-        schedule="@hourly",
-        catchup=False,
+    dag_id="health_check_dag",
+    start_date=datetime(2024, 3, 26),
+    schedule="@hourly",
+    catchup=False,
 ) as dag:
     task1 = PythonOperator(
         task_id="health_check",
@@ -23,7 +23,7 @@ with DAG(
     task2 = SQLExecuteQueryOperator(
         task_id="snowflake_check",
         conn_id="snowflake_conn_serviceaccount",
-        sql="SHOW TABLES"
+        sql="SHOW TABLES",
     )
 
 task1 >> task2
