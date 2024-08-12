@@ -1,17 +1,13 @@
 import boto3
-import psycopg2
 import logging
-from copy import deepcopy
+import psycopg2
 
 from airflow import DAG
 from airflow.models import Variable
-from airflow.operators.python import PythonOperator
-from airflow.providers.common.sql.operators.sql import (
-    SQLExecuteQueryOperator
-)
 from airflow.models.connection import Connection
+from airflow.operators.python import PythonOperator
+from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
-from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 def get_iam_token(host, port, user, region):
     client = boto3.client("rds")
@@ -21,8 +17,8 @@ def get_iam_token(host, port, user, region):
 
 
 def connect_via_ssh():
-    db_host = Variable.get("POSTGRES_DB_HOST")
-    db_user = Variable.get("POSTGRES_DB_USER")  # This is the IAM user or role
+    db_host = Variable.get("RDS_HOST")
+    db_user = Variable.get("RDS_USER")  # This is the IAM user or role
     db_port = 5432
     region = 'us-west-2'
     
