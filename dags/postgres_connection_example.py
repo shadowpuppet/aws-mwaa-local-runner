@@ -9,6 +9,8 @@ from airflow.operators.python import PythonOperator
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 
+# This is meant for debugging purposes
+# Use the approach from the operator_query task below
 def get_iam_token(host, port, user, region):
     client = boto3.client("rds")
     logging.info(user)
@@ -18,6 +20,8 @@ def get_iam_token(host, port, user, region):
     return token
 
 
+# This is meant for debugging purposes
+# Use the approach from the operator_query task below
 def connect_via_ssh():
     db_host = Variable.get("RDS_HOST")
     db_user = Variable.get("RDS_USER")  # This is the IAM user or role
@@ -48,11 +52,17 @@ with DAG(
     schedule=None,
     params={"rds_schema": Variable.get("RDS_SCHEMA")},
 ) as dag:
+    # This is meant for debugging purposes
+    # Use the approach from the operator_query task below
+    # If the run query task is successful, but operator query is not:
+    # Ensure a password is set in your postgres connection
+    # Check that the RDS password (environment variable) is not expired
     run_query = PythonOperator(
         task_id="run_query",
         python_callable=connect_via_ssh,
     )
 
+    # This is how you should connect in real dags
     operator_query = SQLExecuteQueryOperator(
         task_id="operator_query",
         sql="select * from {{ params.rds_schema }}.engagement_district_usage limit 5;",
