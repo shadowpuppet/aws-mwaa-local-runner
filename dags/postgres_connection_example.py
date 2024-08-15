@@ -57,13 +57,13 @@ with DAG(
     # If the run query task is successful, but operator query is not:
     # Ensure a password is set in your postgres connection
     # Check that the RDS password (environment variable) is not expired
-    run_query = PythonOperator(
+    debug_python_task = PythonOperator(
         task_id="run_query",
         python_callable=connect_via_ssh,
     )
 
     # This is how you should connect in real dags
-    operator_query = SQLExecuteQueryOperator(
+    use_this_approach_in_real_dags = SQLExecuteQueryOperator(
         task_id="operator_query",
         sql="select * from {{ params.rds_schema }}.engagement_district_usage limit 5;",
         conn_id="test_postgres_iam_conn",
