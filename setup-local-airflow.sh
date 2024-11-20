@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 set -e
-set -x
 
+echo "Copying Airflow files to test runner"
 cp -v ../dags/*.py ./dags/
 cp -rv ../dags/callables ./dags/
 cp -rv ../dags/callbacks ./dags/
