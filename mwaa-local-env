@@ -97,7 +97,8 @@ reset-db)
    docker-compose -p $DOCKER_COMPOSE_PROJECT_NAME -f ./docker/docker-compose-resetdb.yml up --abort-on-container-exit
    ;;
 start)
-   ./setup-local-airflow.sh
+   echo "Syncing Airflow files to test runner directory"
+   rsync -a ../dags . --exclude __pycache__
    export $(jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' ${AIRFLOW_LOCAL_CONNECTIONS_DIR}/variables.json)
    eval "$(aws configure export-credentials --format env)"
    export RDS_PASSWORD="$(aws rds generate-db-auth-token --hostname ${RDS_HOST} --port 5432 --region us-west-2 --username ${RDS_USER})"
