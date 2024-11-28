@@ -1,6 +1,7 @@
 import boto3
 import logging
 import psycopg2
+from datetime import datetime
 
 from airflow import DAG
 from airflow.models import Variable
@@ -23,20 +24,22 @@ def get_iam_token(host, port, user, region):
 # This is meant for debugging purposes
 # Use the approach from the operator_query task below
 def connect_via_ssh():
-    db_host = Variable.get("RDS_HOST")
-    db_user = Variable.get("RDS_USER")  # This is the IAM user or role
+    db_host = "test-seesaw-db-proxy.proxy-ceu8xezttjlx.us-west-2.rds.amazonaws.com"
+    db_user = "gcsqltestrwdataplatform"  # This is the IAM user or role
     db_port = 5432
     region = "us-west-2"
 
+    # """postgres://gcsqltestrwdataplatform@test-seesaw-db-proxy.proxy-ceu8xezttjlx.us-west-2.rds.amazonaws.com:5432/seesaw?iam=true&sslmode=require"""
+
     token = get_iam_token(db_host, db_port, db_user, region)
     """Establish a connection to a postgres database."""
-    conn = Connection.get_connection_from_secrets("test_postgres_iam_conn")
+    # conn = Connection.get_connection_from_secrets("test_postgres_iam_conn")
     conn_args = {
-        "host": conn.host,
-        "user": conn.login,
+        "host": db_host,
+        "user": db_user,
         "password": token,
-        "dbname": conn.schema,
-        "port": conn.port,
+        "dbname": "seesaw",
+        "port": db_port,
     }
     connection = psycopg2.connect(**conn_args)
     cursor = connection.cursor()
@@ -49,18 +52,19 @@ def connect_via_ssh():
 
 with DAG(
     dag_id="POSTGRESS_CONNECTION_TESTING",
-    schedule=None,
-    params={"rds_schema": Variable.get("RDS_SCHEMA")},
+    params={"rds_schema": "testseesawdataplatform"},
 ) as dag:
     # This is meant for debugging purposes
     # Use the approach from the operator_query task below
     # If the run query task is successful, but operator query is not:
     # Ensure a password is set in your postgres connection
     # Check that the RDS password (environment variable) is not expired
-    debug_python_task = PythonOperator(
-        task_id="debug_python_task",
-        python_callable=connect_via_ssh,
-    )
+    # debug_python_task = PythonOperator(
+    #     task_id="debug_python_task",
+    #     python_callable=connect_via_ssh,
+    # )
+
+    test_postgres_iam_conn = """postgres://gcsqltestrwdataplatform@test-seesaw-db-proxy.proxy-ceu8xezttjlx.us-west-2.rds.amazonaws.com:5432/seesaw?iam=true&sslmode=require"""
 
     # This is how you should connect in real dags
     use_this_approach_in_real_dags = SQLExecuteQueryOperator(
@@ -68,3 +72,7 @@ with DAG(
         sql="select * from {{ params.rds_schema }}.engagement_district_usage limit 5;",
         conn_id="test_postgres_iam_conn",
     )
+
+if __name__ == "__main__":
+    dag.test()
+    # dag.run()
