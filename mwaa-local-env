@@ -15,6 +15,7 @@ display_help() {
    echo "build-image            Build Image Locally"
    echo "reset-db               Reset local PostgresDB container."
    echo "start                  Start Airflow local environment. (LocalExecutor, Using postgres DB)"
+   echo "cli                    Send Airflow CLI commands to running environment."
    echo "test-requirements      Install requirements on an ephemeral instance of the container."
    echo "package-requirements   Download requirements WHL files into plugins folder."
    echo "test-startup-script    Execute shell script on an ephemeral instance of the container."
@@ -97,10 +98,15 @@ reset-db)
    docker-compose -p $DOCKER_COMPOSE_PROJECT_NAME -f ./docker/docker-compose-resetdb.yml up --abort-on-container-exit
    ;;
 start)
+   echo "Syncing Airflow files to test runner directory"
+   rsync -a ../dags . --exclude __pycache__
    export $(jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' ${AIRFLOW_LOCAL_CONNECTIONS_DIR}/variables.json)
    eval "$(aws configure export-credentials --format env)"
    export RDS_PASSWORD="$(aws rds generate-db-auth-token --hostname ${RDS_HOST} --port 5432 --region us-west-2 --username ${RDS_USER})"
    docker-compose -p $DOCKER_COMPOSE_PROJECT_NAME -f ./docker/docker-compose-local.yml up
+   ;;
+cli)
+   docker-compose -p $DOCKER_COMPOSE_PROJECT_NAME -f ./docker/docker-compose-local.yml exec -it local-runner /entrypoint.sh airflow ${@:2}
    ;;
 help)
    display_help
