@@ -19,6 +19,7 @@ dags/
   health_check.py
   example_dag_with_taskflow_api.py
   postgres_connection_example.py
+  postgres_connection_taskflow.py
 docker/
   config/
     airflow.cfg

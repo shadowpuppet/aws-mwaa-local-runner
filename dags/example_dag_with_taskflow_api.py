@@ -5,6 +5,7 @@
 import json
 from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
+from airflow.models import Variable
 
 # These args will get passed on to each operator
 # You can override them on a per-task basis during operator initialization
@@ -59,6 +60,10 @@ def dag_with_taskflow_api():
         instead of saving it to end user review, just prints it out.
         """
 
+        test_rds_usr = Variable.get("RDS_USER")
+        print("TEST_RDS_USER", test_rds_usr)
+        test_rds_schema = Variable.get("RDS_SCHEMA")
+        print("TEST_RDS_SCHEMA", test_rds_schema)
         print("Total order value is: %.2f" % total_order_value)
 
     order_data = extract()

@@ -20,6 +20,7 @@ display_help() {
    echo "package-requirements   Download requirements WHL files into plugins folder."
    echo "test-startup-script    Execute shell script on an ephemeral instance of the container."
    echo "validate-prereqs       Validate pre-reqs installed (docker, docker-compose, python3, pip3)"
+   echo "airflow-testdb-init    Initialize and migrate test-db"
    echo
 }
 
@@ -55,6 +56,27 @@ validate_prereqs() {
 
 build_image() {
    docker build --network host --rm --compress -t amazon/mwaa-local:$AIRFLOW_VERSION ./docker
+}
+
+airflow-testdb-init() {
+   AIRFLOW__DATABASE__SQL_ALCHEMY_CONN="sqlite:////${AIRFLOW_LOCAL_CONNECTIONS_DIR}/airflow/airflow.db"
+   # put current date as yyyy-mm-dd HH:MM:SS in $date
+   date=$(date '+%Y-%m-%d %H:%M:%S')
+
+   if [ -e "$AIRFLOW__DATABASE__SQL_ALCHEMY_CONN" ]; then
+      echo -e "Test-DB file already exists. Skipping build.";
+      echo -e $(airflow db clean --clean-before-timestamp ${date})
+   else
+      echo -e "Initialize the db for first time!";
+      echo -e "$AIRFLOW__DATABASE__SQL_ALCHEMY_CONN";
+      echo "Folder location existence check: $AIRFLOW_LOCAL_CONNECTIONS_DIR/airflow"
+      mkdir -p $AIRFLOW_LOCAL_CONNECTIONS_DIR/airflow
+      pip install apache-airflow[kubernetes]
+      echo $(airflow db migrate)
+   fi
+   export $(jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' ${AIRFLOW_LOCAL_CONNECTIONS_DIR}/variables.json)
+   eval "$(aws configure export-credentials --format env)"
+   export RDS_PASSWORD="$(aws rds generate-db-auth-token --hostname ${RDS_HOST} --port 5432 --region us-west-2 --username ${RDS_USER})"
 }
 
 case "$1" in
@@ -93,6 +115,9 @@ package-requirements)
    ;;   
 build-image)
    build_image
+   ;;
+airflow-testdb-init)
+   airflow-testdb-init
    ;;
 reset-db)
    docker-compose -p $DOCKER_COMPOSE_PROJECT_NAME -f ./docker/docker-compose-resetdb.yml up --abort-on-container-exit
