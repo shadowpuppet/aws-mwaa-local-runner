@@ -48,7 +48,7 @@ def connect_via_ssh():
 
 
 with DAG(
-    dag_id="POSTGRESS_CONNECTION_TESTING",
+    dag_id="POSTGRES_CONNECTION_TESTING",
     schedule=None,
     params={"rds_schema": Variable.get("RDS_SCHEMA")},
 ) as dag:
