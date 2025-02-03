@@ -4,7 +4,7 @@ AIRFLOW_VERSION=2_10_3
 DOCKER_COMPOSE_PROJECT_NAME=aws-mwaa-local-runner-$AIRFLOW_VERSION
 
 export ENVIRONMENT_STAGE="local"
-echo "Environment stage set to:" $ENVIRONMENT_STAGE
+echo "Airflow Environment is:" $ENVIRONMENT_STAGE
 
 display_help() {
    # Display Help
